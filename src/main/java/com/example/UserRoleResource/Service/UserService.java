@@ -58,7 +58,9 @@ public class UserService {
 
     public Long addRoleToUser(Long userId, Long roleId) throws Exception {
         UserEntity user = userRepository.findById(userId).get();
+        if (!user.isActive()) throw new Exception("User is Inactive");
         RoleEntity role = roleRepository.findById(roleId).get();
+        if (!role.isActive()) throw new Exception("Role is Inactive");
         UserRoleEntity userRole = UserRoleEntity.builder()
                 .user(user)
                 .role(role)
@@ -70,8 +72,11 @@ public class UserService {
 
     public Long removeRoleFromUser(Long userId, Long roleId) throws Exception {
         UserEntity user = userRepository.findById(userId).get();
+        if (!user.isActive()) throw new Exception("User is Inactive");
         RoleEntity role = roleRepository.findById(roleId).get();
+        if (!role.isActive()) throw new Exception("Role is Inactive");
         boolean b = false;
+        //Loop needs to be replaced with JPA
         for (UserRoleEntity userRole : user.getUserRoleEntities()) {
             if (userRole.getUser().equals(user) && userRole.getRole().equals(role)) {
                 userRole.setActive(false);
@@ -86,6 +91,7 @@ public class UserService {
 
     public Long setUserInactive(Long userId) throws Exception {
         UserEntity user = userRepository.findById(userId).get();
+        if (!user.isActive()) throw new Exception("User is Already Inactive");
         user.setActive(false);
         for (UserRoleEntity userRole : user.getUserRoleEntities()) userRole.setActive(false);
         userRepository.save(user);

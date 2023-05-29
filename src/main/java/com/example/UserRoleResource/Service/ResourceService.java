@@ -4,7 +4,6 @@ import com.example.UserRoleResource.DTOs.ResourceEntryDto;
 import com.example.UserRoleResource.Entity.ResourceEntity;
 import com.example.UserRoleResource.Entity.RoleResourceEntity;
 import com.example.UserRoleResource.Repository.ResourceRepository;
-import com.example.UserRoleResource.Repository.RoleResourceRepository;
 import com.example.UserRoleResource.VO.ResourceVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,9 +13,6 @@ public class ResourceService {
 
     @Autowired
     private ResourceRepository resourceRepository;
-
-    @Autowired
-    private RoleResourceRepository roleResourceRepository;
 
     public ResourceEntity addResource(ResourceEntryDto resourceEntryDto) throws Exception {
         ResourceEntity resource = ResourceEntity.builder()
@@ -37,6 +33,7 @@ public class ResourceService {
 
     public Long setResourceInactive(Long resourceId) throws Exception {
         ResourceEntity resource = resourceRepository.findById(resourceId).get();
+        if (!resource.isActive()) throw new Exception("Resource is Already Inactive");
         resource.setActive(false);
         for (RoleResourceEntity roleResource : resource.getRoleResourceEntities()) roleResource.setActive(false);
         resourceRepository.save(resource);

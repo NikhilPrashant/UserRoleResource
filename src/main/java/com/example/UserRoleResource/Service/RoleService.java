@@ -61,7 +61,9 @@ public class RoleService {
 
     public Long addResourceToRole(Long roleId, Long resourceId) throws Exception {
         RoleEntity role = roleRepository.findById(roleId).get();
+        if (!role.isActive()) throw new Exception("Role is Inactive");
         ResourceEntity resource = resourceRepository.findById(resourceId).get();
+        if (!resource.isActive()) throw new Exception("Resource is Inactive");
         RoleResourceEntity roleResource = RoleResourceEntity.builder()
                 .role(role)
                 .resource(resource)
@@ -73,8 +75,11 @@ public class RoleService {
 
     public Long removeResourceFromRole(Long roleId, Long resourceId) throws Exception {
         RoleEntity role = roleRepository.findById(roleId).get();
+        if (!role.isActive()) throw new Exception("Role is Inactive");
         ResourceEntity resource = resourceRepository.findById(resourceId).get();
+        if (!resource.isActive()) throw new Exception("Resource is Inactive");
         boolean b = false;
+        //Loop needs to be replaced with JPA
         for (RoleResourceEntity roleResource : role.getRoleResourceEntities()) {
             if (roleResource.getRole().equals(role) && roleResource.getResource().equals(resource)) {
                 roleResource.setActive(false);
@@ -89,6 +94,7 @@ public class RoleService {
 
     public Long setRoleInactive(Long roleId) throws Exception {
         RoleEntity role = roleRepository.findById(roleId).get();
+        if (!role.isActive()) throw new Exception("Role is Already Inactive");
         role.setActive(false);
         for (UserRoleEntity userRole : role.getUserRoleEntities()) userRole.setActive(false);
         for (RoleResourceEntity roleResource : role.getRoleResourceEntities()) roleResource.setActive(false);
